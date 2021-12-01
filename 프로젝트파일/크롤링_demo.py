@@ -23,6 +23,48 @@ def selectSemester(driver,_semester):
     select=Select(semester)
     select.select_by_visible_text(_semester)
     
+def setMajor(driver):
+    majorclass=driver.find_element_by_xpath('//*[@id="hak"]')
+    majorclass.click()
+    getCollegeList(driver)
+
+def setLiberalArt(driver):
+    majorclass=driver.find_element_by_xpath('//*[@id="gong"]')
+    majorclass.click()
+    getAreaList(driver)
+
+
+def getAreaList(driver):
+
+    
+
+    time.sleep(1)
+    soup=bs(driver.page_source,'html.parser')
+    table=soup.select('#cbYungyuk>option')
+    print(table)
+    for college in table:
+        print(college.string)
+        #단과선택
+        major=driver.find_element_by_xpath('//*[@id="cbYungyuk"]')
+        select=Select(major)
+        select.select_by_visible_text(college.string)
+        
+        majorCrowling(driver,college.string)
+   
+
+
+def getCollegeList(driver):
+
+
+    time.sleep(1)
+    soup=bs(driver.page_source,'html.parser')
+    table=soup.select('#cbDaehak>option')
+    for college in table:
+        print(college.string)
+        selectCollege(driver,college.string)
+   
+
+
 
 def selectCollege(driver,_college):
     print(_college)
@@ -35,35 +77,40 @@ def selectCollege(driver,_college):
     time.sleep(1)
     soup=bs(driver.page_source,'html.parser')
     majors=soup.find('select',id='cbHakgwajungong')
-    print(majors)
+  #  print(majors)
 
     majorList=majors.find_all('option')
-    print(majorList[0].string)
+   # print(majorList[0].string)
     for i in majorList:
         print(i.string)
+        #단과선택
+        major=driver.find_element_by_xpath('//*[@id="cbHakgwajungong"]')
+        select=Select(major)
+        select.select_by_visible_text(i.string)
+        
         majorCrowling(driver,i.string)
 
 
 def majorCrowling(driver, _major):
-    
-#단과선택
-    major=driver.find_element_by_xpath('//*[@id="cbHakgwajungong"]')
-    select=Select(major)
-    select.select_by_visible_text(_major)
-
 
 #조회버튼
     tab=driver.find_element_by_xpath('//*[@id="btn_Find"]')
     tab.click()
 
-#tab개수만큼 크롤
+    
+
+#tab개수만큼 크롤링
     soup=bs(driver.page_source,'html.parser')
     lastPage=soup.find('tfoot')
-    lastPage=lastPage.find_all('a')[-1]
-    
-    
-    lastPageStr=lastPage['onclick']
-    pageNum=int(lastPageStr[lastPageStr.find('(')+1:lastPageStr.find(')')])
+    lastPage=lastPage.find_all('a')
+    if(len(lastPage)>1):
+        lastPage=lastPage[-1]
+        lastPageStr=lastPage['onclick']
+        pageNum=int(lastPageStr[lastPageStr.find('(')+1:lastPageStr.find(')')])
+    elif(len(lastPage)==0):
+        return
+    else:
+        pageNum=1
     print(pageNum)
 
     jsonData={}
@@ -127,10 +174,12 @@ def main():
    # selectGrade(driver,'3학년')
     selectSemester(driver,"2학기")
 
-    selectCollege(driver,'공과대학')
+    setLiberalArt(driver)
+    
+    setMajor(driver)
 
 
-    #driver.close()
+#    driver.close()
 
 
 if __name__=='__main__':
