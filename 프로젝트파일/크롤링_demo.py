@@ -128,10 +128,10 @@ def majorCrowling(driver, _major):
         area=area.find('tbody')
         table=area.find_all('tr')
         #print(table)
-
         for i in range(0,len(table)):
             line=table[i]
             attr=line.find_all('td')
+
             grade=attr[0].string
             classTag=attr[1].string
             area=attr[4].string
@@ -139,7 +139,7 @@ def majorCrowling(driver, _major):
             className=attr[8].string
             professor=attr[12].string
             credit=attr[13].string
-            classTime=attr[19].string
+            classTime=attr[19].get_text()
             classRoom=attr[20].string
             data={'학년':grade,'반':classTag,'영역':area, '수업번호':classNum,
                   '교과목명':className,'교강사':professor,'학점':credit,'수업시간':classTime,
